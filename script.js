@@ -120,52 +120,52 @@ const lottery_promse = new Promise(function (resolve, reject) {
 lottery_promse.then(res => console.log(res)).catch(err => console.error(err));
 
 // promisfying set timeout
-const wait = function (seconds) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, seconds * 1000);
-  });
-};
-wait(2).then(() => {
-  console.log('i waited for 2 secs');
-  return wait(2);
-});
+// const wait = function (seconds) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
+// wait(2).then(() => {
+//   console.log('i waited for 2 secs');
+//   return wait(2);
+// });
 
 // promise the geolocation api
 
-console.log('getting location');
+// console.log('getting location');
 
-const get_position = function () {
-  return new Promise(function (resolve, reject) {
-    navigator.geolocation.getCurrentPosition(
-      function (position) {
-        resolve(position);
-      },
-      err => reject(err)
-    );
-  });
-};
+// const get_position = function () {
+//   return new Promise(function (resolve, reject) {
+//     navigator.geolocation.getCurrentPosition(
+//       function (position) {
+//         resolve(position);
+//       },
+//       err => reject(err)
+//     );
+//   });
+// };
 // upgrade of code
 
-function where_am_i(lat, lng) {
-  get_position()
-    .then(pos => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    })
-    .then(reponse => reponse.json())
-    .then(data => {
-      console.log(`youre in ${data.city} ${data.country}`);
-      return fetch(`https://restcountries.com/v3.1/name/${data.country}`)
-        .then(response => response.json())
-        .then(data => {
-          console.log(data);
-          renderCountry(data[0]);
-        });
-    })
-    .catch(err => alert(err));
-}
+// function where_am_i(lat, lng) {
+//   get_position()
+//     .then(pos => {
+//       const { latitude: lat, longitude: lng } = pos.coords;
+//       return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+//     })
+//     .then(reponse => reponse.json())
+//     .then(data => {
+//       console.log(`youre in ${data.city} ${data.country}`);
+//       return fetch(`https://restcountries.com/v3.1/name/${data.country}`)
+//         .then(response => response.json())
+//         .then(data => {
+//           console.log(data);
+//           renderCountry(data[0]);
+//         });
+//     })
+//     .catch(err => alert(err));
+// }
 
-btn.addEventListener('click', where_am_i);
+// btn.addEventListener('click', where_am_i);
 
 // Coding Challenge #2
 
@@ -175,7 +175,10 @@ Build the image loading functionality that I just showed you on the screen.
 Tasks are not super-descriptive this time, so that you can figure out some stuff on your own. Pretend you're working on your own 😉
 
 PART 1
-1. Create a function 'createImage' which receives imgPath as an input. This function returns a promise which creates a new image (use document.createElement('img')) and sets the .src attribute to the provided image path. When the image is done loading, append it to the DOM element with the 'images' class, and resolve the promise. The fulfilled value should be the image element itself. In case there is an error loading the image ('error' event), reject the promise.
+1. Create a function 'createImage' which receives imgPath as an input. This function returns a promise which creates a new
+ image (use document.createElement('img')) and sets the .src attribute to the provided image path. When the image is done loading, append it to the DOM element with the
+ 'images' class, and resolve the promise. The fulfilled value should be the image element itself. 
+ In case there is an error loading the image ('error' event), reject the promise.
 
 If this part is too tricky for you, just watch the first part of the solution.
 
@@ -186,3 +189,94 @@ PART 2
 5. After the second image has loaded, pause execution for 2 seconds again;
 6. After the 2 seconds have passed, hide the current image.
 */
+
+// const wait = function (seconds) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
+
+// const imgContainer = document.querySelector('.images');
+
+// function createImage(imgPath) {
+//   return new Promise(function (resolve, reject) {
+//     const img = document.createElement('img');
+//     img.src = imgPath;
+
+//     img.addEventListener('load', function () {
+//       imgContainer.append(img);
+//       resolve(img);
+//     });
+//     img.addEventListener('error', function () {
+//       reject(new Error('image not found'));
+//     });
+//   });
+// }
+// let current_img;
+// createImage('img/img-1.jpg')
+//   .then(img => {
+//     current_img = img;
+//     console.log('mage 1 ');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     current_img.style.display = 'none';
+//   })
+//   .catch(err => console.error(err));
+
+// btter way of consuming promises
+
+const renderCountry = function (data, className = '') {
+  const html = `
+    <article class="country ${className}">
+      <img class="country__img" src="${data.flags.png}" />
+      <div class="country__data">
+        <h3 class="country__name">${data.name.common}</h3>
+        <h4 class="country__region">${data.region}</h4>
+        <p class="country__row"><span>👫</span>${(
+          +data.population / 1000
+        ).toFixed(1)}m people</p>
+        <p class="country__row"><span>🗣️</span>${data.languages.eng}</p>
+        <p class="country__row"><span>💰</span>${data.currencies[0]}</p>
+      </div>
+    </article>
+    `;
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
+};
+
+// const where_am_i = async function (country) {
+//   try {
+//     const res = await fetch(`https://restcountries.com/v3.1/name/${country}`);
+//     console.log(res);
+//     const data = await res.json();
+//     console.log(data);
+//     renderCountry(data[0]);
+//   } catch {
+//     err => console.log(err);
+//   }
+// };
+
+const get_3_countries = async function (c1, c2, c3) {
+  try {
+    let arr = [];
+
+    const res = await fetch(`https://restcountries.com/v3.1/name/${c1}`);
+    const data = await res.json();
+    arr.push(data);
+
+    const res_2 = await fetch(`https://restcountries.com/v3.1/name/${c2}`);
+    const data2 = await res_2.json();
+    arr.push(data2);
+
+    const res_3 = await fetch(`https://restcountries.com/v3.1/name/${c3}`);
+    const data3 = await res_3.json();
+    arr.push(data3);
+
+    console.log(arr.map(d => d[0].capital));
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+get_3_countries('portugal', 'canada', 'nigeria');
